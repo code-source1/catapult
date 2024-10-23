@@ -14,13 +14,8 @@ To utilize this framework, you need to add specific Python scripts to your direc
 - `token.py`: Tracks the number of tokens used during the interaction, helping to evaluate computational costs.
 - `pass.py`: Monitors and reports the pass rate of the repairs across multiple iterations, providing metrics on the effectiveness of the repairs.
 
-## Usage
-Execute the following commands in your terminal to interact with the system:
-- To run your program normally:  
 
-- To initiate LLM-driven repair on the C code:  
-
-## Configuration
+## Usage and Configuration
 Modify the following paths in the scripts according to your environment setup:
 - `tcl_script_path`: Path to your TCL script for running Catapult HLS.  
 Example: `/path/to/your/run_catapult.tcl`
