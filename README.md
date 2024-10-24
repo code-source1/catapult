@@ -32,3 +32,6 @@ Ensure these paths are correctly set to match your local environment.
 
 ## Conclusion
 This framework leverages LLMs to simplify the conversion of C/C++ code to HLS-compatible code, thereby enhancing the efficiency of HLS workflows.
+
+## Reference
+Kangwei Xu, Grace Li Zhang, Xunzhao Yin, Cheng Zhuo, Ulf Schlichtmann, and Bing Li, "Automated C/C++ Program Repair for High-Level Synthesis via Large Language Models," In Proceedings of the 2024 ACM/IEEE International Symposium on Machine Learning for Computer-Aided Design (MLCAD), 2024. Association for Computing Machinery, New York, NY, USA, Article 15, 1–9.
