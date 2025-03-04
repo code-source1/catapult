@@ -22,7 +22,6 @@ directive set -CLOCKS {{clk {{-CLOCK_PERIOD 1.0 -CLOCK_EDGE rising -CLOCK_UNCERT
 go assembly
 go architect
 go allocate
-
 go extract
 flow run /SCVerify/launch_make ./scverify/Verify_orig_cxx_osci.mk {{}} SIMTOOL=osci sim
 quit
