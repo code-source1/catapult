@@ -216,7 +216,6 @@ def run_design_compiler(iteration, base_dir):
     pd.DataFrame(excel_info).to_csv(report_csv)
     print(f"Design Compiler synthesis completed for iteration {iteration}. Report saved to {report_path}")
 
-
 def main():
     iteration_limit = 2
     base_dir = "/.../E3_BFS"
