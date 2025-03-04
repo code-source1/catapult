@@ -33,4 +33,4 @@ Example: `/path/to/catapult/2022.2-1008433/Mgc_home/bin`
 Ensure these paths are correctly set to match your local environment.
 
 ## Conclusion
-This framework leverages LLMs to simplify the refactoring and optimization of C/C++ code to HLS-compatible code , thereby simplifying the HLS workflow and enhancing the synthesized hardware efficiency.
+The proposed LLM-aided C/C++ code refactoring and optimization framework for HLS covers runtime profiling and C/C++ code refactoring for hardware generation and performance optimization with minimal human effort.
