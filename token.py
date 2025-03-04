@@ -4,7 +4,6 @@ main_folders = [
     "/.../E1_linear_program",
     "/.../E2_binary_tree"
 ]
-
 # def count_tokens_in_file(file_path):
 #     try:
 #         with open(file_path, 'r', encoding='utf-8') as file:
