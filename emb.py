@@ -52,7 +52,6 @@ def main():
                 highest_similarity = similarity
                 most_similar_file = file_name
 
-    
     print(f"{most_similar_file},{highest_similarity.item()}")
 
     #print(f"The most similar file is {most_similar_file} with a similarity of {highest_similarity.item()}.")
