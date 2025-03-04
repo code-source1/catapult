@@ -7,12 +7,15 @@ In High-Level Synthesis (HLS), converting a standard C/C++ program into an HLS-c
 To utilize this framework, you need to add specific Python scripts to your directory containing the regular C/C++ program. These scripts facilitate the interaction between LLM and the Catapult HLS tool for refactoring and optimization.
 
 ### Scripts Description
+- `pre.py` and `ext.py`: Extract reference examples from the HLS tool manual.
+- `reasoning.py`: Step-wise reasoning to find potential errors.
 - `emb.py`: Matches repair templates in the repair library.
 - `compile.py`: Use this script to run your program as usual.
 - `inter_compile.py`: Automates the interaction for repairing regular C code using the LLM.
 - `run.py`: Uses the LLM to attempt multiple repairs on the C code.
 - `pass.py`: Monitors and reports the pass rate of the repairs across multiple iterations, providing metrics on the effectiveness of the repairs.
-
+- `pipe.py`: Enable efficient pipelining breaks down complex loop structures into smaller tasks.
+- `bwa.py`: Analyze and fine-tune the bit width of floating-point variables.
 
 ## Usage and Configuration
 Modify the following paths in the scripts according to your environment setup:
@@ -30,7 +33,4 @@ Example: `/path/to/catapult/2022.2-1008433/Mgc_home/bin`
 Ensure these paths are correctly set to match your local environment.
 
 ## Conclusion
-This framework leverages LLMs to simplify the conversion of C/C++ code to HLS-compatible code, thereby enhancing the efficiency of HLS workflows.
-
-## Reference
-Kangwei Xu, Grace Li Zhang, Xunzhao Yin, Cheng Zhuo, Ulf Schlichtmann, and Bing Li, "Automated C/C++ Program Repair for High-Level Synthesis via Large Language Models," In Proceedings of the 2024 ACM/IEEE International Symposium on Machine Learning for Computer-Aided Design (MLCAD), 2024. Association for Computing Machinery, New York, NY, USA, Article 15, 1–9.
+This framework leverages LLMs to simplify the refactoring and optimization of C/C++ code to HLS-compatible code , thereby simplifying the HLS workflow and enhancing the synthesized hardware efficiency.
