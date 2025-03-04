@@ -53,7 +53,6 @@ for base_path in base_paths:
     status_counters[base_path] = counters
     folder_details[base_path] = folder_status
 
-
 with open("pass.txt", "w") as outfile:
     for base_path in base_paths:
         outfile.write(f"\nResults for {base_path}:\n")
