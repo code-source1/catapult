@@ -60,11 +60,10 @@ def collect_results(base_dir, num_folders, final_file):
 
 def main():
     base_dir = "/.../E3_BFS"
-    num_folders = 30
+    num_folders = 15
     all_files = ['compile.py', 'emb.py', 'inter_compile.py', 'tb.cpp', 'main.cpp', 'NangateOpenCellLibrary_typical.db']
     files_to_modify = ['compile.py', 'emb.py', 'inter_compile.py']
     final_output_file = os.path.join(base_dir, 'final.txt')
-    
     create_folders_and_copy_files(base_dir, num_folders, all_files, files_to_modify)
     run_inter_compile_scripts(base_dir, num_folders)
     collect_results(base_dir, num_folders, final_output_file)
