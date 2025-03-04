@@ -1,17 +1,16 @@
-# LLM-Driven Program Repair Framework for High-Level Synthesis
+# LLM-Aided Refactoring and Optimization of C/C++ Code for High-Level Synthesis
 
 ## Introduction
-In High-Level Synthesis (HLS), converting a standard C/C++ program into an HLS-compatible version (HLS-C) requires significant manual effort. Our LLM-driven program repair framework aims to automate this process by taking regular C/C++ code as input and generating its corresponding HLS-C code ready for synthesis.
+In High-Level Synthesis (HLS), converting a standard C/C++ program into an HLS-compatible version (HLS-C) requires significant manual effort. Our LLM-driven program repair framework aims to automate this process by taking regular C/C++ code as input and generating its optimized HLS-C code ready for synthesis.
 
 ## Setup
-To utilize this framework, you need to add specific Python scripts to your directory containing the regular C/C++ program. These scripts facilitate the repair and interaction between the LLM and the Catapult HLS tool.
+To utilize this framework, you need to add specific Python scripts to your directory containing the regular C/C++ program. These scripts facilitate the interaction between LLM and the Catapult HLS tool for refactoring and optimization.
 
 ### Scripts Description
 - `emb.py`: Matches repair templates in the repair library.
 - `compile.py`: Use this script to run your program as usual.
 - `inter_compile.py`: Automates the interaction for repairing regular C code using the LLM.
 - `run.py`: Uses the LLM to attempt multiple repairs on the C code.
-- `token.py`: Tracks the number of tokens used during the interaction, helping to evaluate computational costs.
 - `pass.py`: Monitors and reports the pass rate of the repairs across multiple iterations, providing metrics on the effectiveness of the repairs.
 
 
