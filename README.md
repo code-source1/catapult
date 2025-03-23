@@ -14,7 +14,6 @@ To utilize this framework, you need to add specific Python scripts to your direc
 - `inter_compile.py`: Automates the interaction for repairing regular C code using the LLM.
 - `run.py`: Uses the LLM to attempt multiple repairs on the C code.
 - `pass.py`: Monitors and reports the pass rate of the repairs across multiple iterations, providing metrics on the effectiveness of the repairs.
-- `pipe.py`: Enable efficient pipelining breaks down complex loop structures into smaller tasks.
 - `bwa.py`: Analyze and fine-tune the bit width of floating-point variables.
 
 ## Usage and Configuration
