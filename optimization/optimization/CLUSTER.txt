@@ -1,0 +1,24 @@
+CLUSTER
+
+Description
+
+Beginner Level
+
+The CLUSTER directive specifies mult and add structures to detect and extract.
+
+In the first solution (test.v1), the CLUSTER directive is initially unset, so Catapult does not extract any arithmetic operations for clustering. As a result, the scheduler uses library estimates for the individual mult and add operations. Because the default DESIGN_GOAL is 'area', Catapult places the accumulator in the second C-Step.
+
+IMAGE
+
+In the second solution (test.v2), the CLUSTER directive is set to extract any detected multadd operations. When Catapult locates the multadd operator, it extracts the functionality and characterizes seven data points (with various area and delay values) for the operator. You can view the available area/delay values for each characterized point in the Resources Constraint editor.
+
+IMAGE
+
+The following schedule shows that the example design with an extracted multadd cluster (CLU block), as shown in the figure below:
+
+IMAGE
+
+In this example, the first solution (test.v1) used library estimates to determine the area/delay values. In the second solution (test.v1), Catapult synthesized the multadd operation using the internal prototyping engine to extract more accurate area/timing values. As a result, the scheduler was able to reduce the latency and area of the design in the second solution.
+
+Command syntax example:
+directive set /test -CLUSTER multadd
