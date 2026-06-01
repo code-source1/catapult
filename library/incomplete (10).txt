@@ -1,0 +1,28 @@
+T_Ref10
+# Error: $PROJECT_HOME/main.cpp(34): expected a statement (CRD-127)
+# Error: Compilation aborted (CIN-5)
+
+Overview: Incomplete Statement: HLS tools generate a violation when
+the switch/case statement does not completely cover the range of values
+for the object used in conditional expressions. Considering the
+uncovered values to complete the statement is needed.
+
+Example of a Violation:
+    #pragma hls_design top
+    void select_op(uint2 op, ac_int<8, false> &res) {
+      switch (op) {
+        case 1: res = 10;
+        case 3: res = 30;
+      }
+    }
+    // op ∈ {0,1,2,3}, only 1 and 3 handled
+
+Example of a Fix:
+    #pragma hls_design top
+    void select_op(uint2 op, ac_int<8, false> &res) {
+      switch (op) {
+        case 1: res = 10;
+        case 3: res = 30;
+        default: res = 0;
+      }
+    }

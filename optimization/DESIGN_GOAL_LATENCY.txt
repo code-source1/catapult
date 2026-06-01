@@ -1,0 +1,24 @@
+Optimization targets: Large latency
+DESIGN_GOAL_LATENCY
+
+Description
+
+The DESIGN_GOAL directive sets the scheduling optimization goal. When it is set to latency,
+Catapult prioritizes minimizing the number of C-steps and reducing schedule length. This is
+the most direct scheduling-level directive for a Large latency request.
+
+Command syntax example:
+directive set -DESIGN_GOAL latency
+directive set /process_top/core -DESIGN_GOAL latency
+
+How to use:
+- Select this template when the user asks for Large latency or latency reduction.
+- It can be combined with PIPELINE_INIT_INTERVAL or UNROLL if more throughput/parallelism is
+  acceptable.
+- Do not combine it with DESIGN_GOAL_AREA in the same TCL script, because only one
+  DESIGN_GOAL should define the scheduler priority for the same design scope.
+
+Why this target fits:
+DESIGN_GOAL latency tells Catapult's scheduler to reduce schedule length and C-step count.
+It directly addresses Large latency by prioritizing faster completion, often at the cost of
+more area or power.

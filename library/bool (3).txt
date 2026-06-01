@@ -1,0 +1,32 @@
+T_Ref3
+# Error: $PROJECT_HOME/main.cpp(14): variable "increment" is used before its value is set (CRD-549)
+# Error: $PROJECT_HOME/main.cpp(15): incrementing a bool value is deprecated (CRD-708)
+# Error: Compilation aborted (CIN-5)
+
+Overview: In C++ and similar languages, boolean values (true and false) are not intended for
+arithmetic operations like incrementation (bt += 1 or bt++). The operations attempt to treat the
+boolean as an integer type, which is conceptually incorrect and can lead to unexpected behavior
+or errors.
+
+Example of a Violation:
+    void baz(bool b) {
+        bool neg = -b;      // Incorrect: unary minus on bool
+    }
+    // Bool cannot be negated numerically.
+
+Correction Example 1 uses an integer type:
+    void baz(bool b) {
+        int val = b ? 1 : 0;
+        int neg = -val;
+        bool result = (neg != 0);
+    }
+
+Correction Example 2 uses conditional logic:
+    void baz(bool b) {
+        bool result;
+        if (!b) {
+            result = false;
+        } else {
+            result = true;
+        }
+    }

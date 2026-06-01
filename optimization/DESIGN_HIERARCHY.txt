@@ -1,0 +1,27 @@
+Optimization targets: Large area, Large latency
+The DESIGN_HIERARCHY directive specifies the list of functions comprising hierarchical blocks in the design.
+
+In the first solution (test.v1), Catapult reads the design and the DESIGN_HIERARCHY directive sets the top-level design to the block1 hierarchical block. Catapult will optimize this block and save the results to the project. The following illustration shows the top-level symbol for block1:
+
+IMAGE
+
+In the second solution (test.v2), Catapult changes the top-level design to block2, optimizes the hierarchical block and saves the results to the project. The following illustration shows the top-level symbol for block2:
+
+IMAGE
+
+In the third solution (test.v3), Catapult sets the top-level design to the top of the design and uses the solution library add command to read the solutions for the lower level hierarchical blocks. The MAP_TO_MODULE directive maps the blocks to their previously synthesized solutions. The channel that connects the data lines between the blocks is mapped to a ccs_pipe component with a FIFO_DEPTH of 3. The following illustration shows the schematic of this design that was stitched together using the bottom-up (BUP) flow:
+
+IMAGE
+
+Comparing the solutions, the directive allowed Catapult to optimize different levels of hierarchy in separate solutions as shown in Example 1 and 2. After the blocks are synthesized, they were included in the project library for use in the top-level design (Example 3). In Example 3 the blocks are interconnected through pipe
+. The area of the top-level design (test.v1) is greater than the sum of the two blocks due to the ccs_pipe component. Since the top-level design contains no combinational logic, the slack of the top-level matches the worst slack of the individual blocks.
+
+Command syntax example:
+directive set -DESIGN_HIERARCHY {block1 block2 test}
+directive set -DESIGN_HIERARCHY {block2 block1 test}
+directive set -DESIGN_HIERARCHY {test block1 block2}
+
+Why this target fits:
+DESIGN_HIERARCHY changes which functions are optimized as separate hierarchical blocks. This can
+improve area by reusing or separately optimizing blocks, and can improve latency by isolating a
+critical block for focused scheduling. It is best for designs with meaningful sub-functions.

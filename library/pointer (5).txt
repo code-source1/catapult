@@ -1,0 +1,31 @@
+T_Ref5
+# Error: $PROJECT_HOME/main.cpp(82): Unsupported synthesis feature 'pointers-to-pointers on the interface' (CIN-243)
+# Error: Compilation aborted (CIN-5)
+
+Overview: Pointer: Dynamic Pointers are strictly forbidden in HLS tools,
+except for statically analyzable ones. Thus, developers need
+to manually convert pointer access to array access.
+
+Example of a Violation:
+<CPP>
+int maxElement(short* arr, int len) {
+    short* p = arr;
+    short maxv = *p++;
+    while (p < arr + len) {
+        if (*p > maxv) maxv = *p;
+        ++p;
+    }
+    return maxv;
+}
+</CPP>
+
+Correction Example uses array indexing:
+<CPP>
+int maxElementIndex(short arr[50], int len) {
+    short maxv = arr[0];
+    for (int i = 1; i < len; ++i) {
+        if (arr[i] > maxv) maxv = arr[i];
+    }
+    return maxv;
+}
+</CPP>

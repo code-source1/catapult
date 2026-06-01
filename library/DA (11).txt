@@ -1,0 +1,46 @@
+# Error: $PROJECT_HOME/main.cpp(27): Unable to reduce array size for variable 'input', currently 1024 words (CIN-84)
+# Error: $PROJECT_HOME/main.cpp(27): Unable to reduce array size for variable 'output', currently 1024 words (CIN-84)
+# Error: Compilation aborted (CIN-5)
+# Error: go compile: Failed compile
+
+Overview: Dynamic Array: Very large interface arrays or local arrays can prevent Catapult from
+reducing storage to the true design size. If the algorithm only supports a small maximum
+transaction size, express that maximum as a compile-time constant in the function signature and
+all loops.
+
+Example of a Violation:
+    void transform(int count, int in[1024], int out[1024]) {
+        for (int i = 0; i < count; ++i) {
+            out[i] = in[i] + 1;
+        }
+    }
+// Catapult sees 1024-word interface memories even when count is expected to be small.
+
+Correction Example uses a real static bound:
+    #define MAX_COUNT 16
+
+    void transform(int count, int in[MAX_COUNT], int out[MAX_COUNT]) {
+        int limit = count;
+        if (limit > MAX_COUNT) limit = MAX_COUNT;
+        for (int i = 0; i < MAX_COUNT; ++i) {
+            if (i < limit) {
+                out[i] = in[i] + 1;
+            }
+        }
+    }
+
+Correction Example with ac_int data width:
+    #include <ac_int.h>
+    #define MAX_COUNT 16
+
+    void transform_small(int count, ac_int<10, true> in[MAX_COUNT],
+                         ac_int<10, true> out[MAX_COUNT]) {
+        for (int i = 0; i < MAX_COUNT; ++i) {
+            if (i < count) out[i] = in[i] + 1;
+        }
+    }
+
+Key conversion steps:
+    - Replace 1024 or runtime-sized arrays with the real MAX_* bound.
+    - Clamp n/count to MAX_* before indexing.
+    - Use loops bounded by MAX_*, with if (i < n) for valid elements.

@@ -1,0 +1,34 @@
+Optimization targets: High power
+POWER_REDUCTION
+
+Description
+
+When the design reports high power, prefer optimization choices that reduce switching activity
+and avoid unnecessary parallel hardware. In Catapult, this usually means selecting an area-oriented
+design goal, keeping loops rolled when throughput is not the primary objective, avoiding aggressive
+UNROLL, and using a relaxed pipeline initiation interval instead of forcing II=1 everywhere.
+
+This template is useful when the user asks for:
+Large power
+High power
+Power optimization
+Low-power RTL
+
+Command syntax examples:
+directive set -DESIGN_GOAL area
+directive set /process_top/core/main -UNROLL 1
+directive set /process_top/core/main -PIPELINE_INIT_INTERVAL 2
+
+Guidance
+
+- If the current design is over-parallelized, reduce or remove loop unrolling first.
+- If latency is acceptable, avoid forcing PIPELINE_INIT_INTERVAL 1 because it may increase
+  register activity and resource count.
+- Prefer DESIGN_GOAL area as a conservative low-power proxy when a dedicated power directive
+  is not available in the flow.
+- After synthesis, compare downstream synthesis reports for Area, AreaSeq, slack, and timing.
+
+Why this target fits:
+This template targets High power by reducing unnecessary parallelism and switching activity. It
+uses area-oriented scheduling, avoids aggressive unrolling, and relaxes pipelining when latency
+allows. These choices reduce the amount of active hardware and registers toggling each cycle.

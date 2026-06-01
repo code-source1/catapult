@@ -1,0 +1,44 @@
+# Error: Unsupported language feature 'recursion' (CIN-15)
+# Error: Compilation aborted (CIN-5)
+
+Overview: Recursion, requiring dynamic memory in a stack, is not supported by
+HLS tools. Converting into a loop-based iteration or using template functions
+provided by the official reference manual of Catapult is required.
+
+Example of a Violation:
+    struct Graph { int v, e; Graph **nbr; };
+    void dfs(Graph *g, bool *vis) {
+        if (vis[g->v]) return;
+        vis[g->v] = true;
+        for (int i = 0; i < g->e; ++i)
+            dfs(g->nbr[i], vis);
+    }
+    // Recursion needs to be replaced by loops.
+
+Correction Example 1 uses a loop-based iteration:
+    void dfs_iter(Graph *g, bool *vis) {
+        Graph* stack[128];
+        int top = 0;
+        stack[top++] = g;
+        while (top) {
+            Graph* cur = stack[--top];
+            if (vis[cur->v]) continue;
+            vis[cur->v] = true;
+            for (int i = 0; i < cur->e; ++i)
+                stack[top++] = cur->nbr[i];
+        }
+    }
+
+Correction Example 2 uses templates provided by the Catapult manual:
+    template <int D>
+    struct DFSTpl {
+        static void run(Graph *g, bool *vis) {
+            if (vis[g->v] || D==0) return;
+            vis[g->v] = true;
+            for (int i = 0; i < g->e; ++i)
+                DFSTpl<D-1>::run(g->nbr[i], vis);
+        }
+    };
+    void dfs_top(Graph *g, bool *vis) {
+        DFSTpl<6>::run(g, vis);  // max depth 6
+    }

@@ -1,0 +1,55 @@
+# Error: $PROJECT_HOME/main.cpp(14): Unsupported language feature 'variable length array (VLA)' (CIN-15)
+# Error: $PROJECT_HOME/main_c3.cpp(12): Unable to reduce array size for variable 'data_x', currently 1024 words (CIN-84)
+# Error: $PROJECT_HOME/main_c3.cpp(12): Unable to reduce array size for variable 'data_y', currently 1024 words (CIN-84) 
+# Error: $PROJECT_HOME/tb.cpp(18):             function "knn(fixed_point, fixed_point, fixed_point *, fixed_point *, int, int, int &)" (declared at line 7) (CRD-308)
+# Error: $PROJECT_HOME/tb.cpp(18):             argument types are: (fixed_point, fixed_point, fixed_point [10], fixed_point [10], int, int, int) (CRD-308)
+
+a simple example of a C++ function using dynamic memory allocation, followed by its equivalent using static array management.
+
+Example in Dynamic Array Management:
+Here's a brief function that dynamically allocates an array of integers, fills it, and then cleans up the memory:
+
+<CPP>
+#include <iostream>
+
+void dynamicExample(int size) {
+    int* array = new int[size]; // Dynamic allocation
+
+    for (int i = 0; i < size; i++) {
+        array[i] = i * 10; // Fill the array
+    }
+
+    for (int i = 0; i < size; i++) {
+        std::cout << array[i] << " "; // Print the array
+    }
+    std::cout << std::endl;
+
+    delete[] array; // Free the allocated memory
+}
+
+
+Example in Static Array Management:
+Now, let's see the equivalent function using static array management. The array size must be predefined:
+
+<CPP>
+#include <iostream>
+
+void staticExample() {
+    const int size = 10;
+    int array[size]; // Static array with fixed size
+
+    for (int i = 0; i < size; i++) {
+        array[i] = i * 10; // Fill the array
+    }
+
+    for (int i = 0; i < size; i++) {
+        std::cout << array[i] << " "; // Print the array
+    }
+    std::cout << std::endl;
+}
+
+
+Key Differences:
+Memory Management: Dynamic example uses new and delete to manage memory, which allows it to set the array size at runtime. The static example uses a fixed-size array declared at compile time.
+Flexibility vs. Simplicity: The dynamic method is more flexible as it can handle varying array sizes determined at runtime. The static method is simpler but less flexible, requiring the size to be known in advance.
+Safety and Overhead: Static arrays do not require manual memory management, reducing the risk of memory leaks and overhead from memory allocation and deallocation. However, static arrays limit the scalability and adaptability of the code

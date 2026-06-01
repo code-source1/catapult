@@ -1,0 +1,55 @@
+# Error: $PROJECT_HOME/main.cpp(6): too many initializer values (CRD-146)
+# Warning: $PROJECT_HOME/main.cpp(9): subscript out of range (CRD-175)
+# Error: Compilation aborted (CIN-5)
+
+ABR/ABW : Array out-of-Bounds Read and Write
+This rule checks for out-of-bounds reads from/to an array or bit-vector. CDesignChecker determines whether
+the index value will always be within the defined range of the array. A violation is reported if the index could
+go out of range.
+These violations are typically difficult to debug and can lead to mismatches between the design source and
+the generated RTL.
+NOTE: The semantics for the slc and set_slc functions for the ac_int<> datatype are well-defined so no outof-bounds check is performed.
+Example of a Violation
+The default severity for violating this simulation mismatch check is ‘error’.
+1 #include "ac_int.h"
+2
+3 typedef ac_int<6, false> ac6;
+4
+5 #pragma hls_design top
+6 void ABR (int in,
+7 ac6 w_addr,
+8 ac6 r_addr,
+9 int &out) {
+10
+11 static int arr[60];
+12
+13 arr[ w_addr ] = in;
+14 out = arr[ r_addr ];
+15 }
+The example violation code contains an array with sixteen elements, yet the assignment to an index at
+w_addr, and the read from the index of r_addr both have the potential to exceed the maximum index of sixty,
+because w_addr and r_addr are both of type ac_int<6, false>.
+
+Example of Fix
+ 1 #include "ac_int.h"
+ 2 
+ 3 typedef ac_int<6, false> ac6;
+ 4 
+ 5 #pragma hls_design top
+ 6 void ABR (int in,
+ 7 ac6 w_addr,
+ 8 ac6 r_addr,
+ 9 int &out) {
+10 
+11 static int arr[60];
+12 
+13 if (w_addr > ac6(0) && w_addr < ac6(60) ) // Add bound check
+14 arr[w_addr] = in;
+15 
+16 if (r_addr > ac6(0) && r_addr < ac6(60) ) // Add bound check
+17 out = arr[r_addr];
+18 }
+The example solution code uses inequalities, to ensure that the code never attempts to reach further than 
+sixty when indexing arr. This avoids the ABR and ABW violations present in the violation example. You could 
+alternatively apply waivers or constraints instead of adding a bound check, if you are confident that the index 
+will never go out of bounds in actual operation.

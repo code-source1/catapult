@@ -1,0 +1,27 @@
+T_Ref3
+# Error: $PROJECT_HOME/bounds.cpp(12): out-of-bound array read 
+# Error: $PROJECT_HOME/bounds.cpp(13): illegal shift amount 
+# Error: $PROJECT_HOME/bounds.cpp(20): unsupported exception keyword 'catch' 
+# Error: Compilation aborted 
+
+Overview: Exception-handling: Violations are reported when there are
+out-of-bound array reads/writes and illegal shifts. Additionally,
+whereas CPU programs use stack popping to handle exceptions, on ASIC,
+exception-handling modules need to be built to deliver the termination
+message to other modules.
+
+Example of a Violation:
+    int get_val(int *buf) {
+        int idx = buf[8];       // buf size is 8
+        int y = 1 << (idx+32);  // may overflow shift
+        try { y++; } catch (...) {}
+        return y;
+    }
+
+Correction Example 1 inserts hardware checks:
+    int get_val_safe(int *buf, ExceptionUnit &eu) {
+        int idx = (8 < BUF_SIZE) ? buf[8] : (eu.raise_exception(STATUS_OOB_READ),0);
+        int shift = idx + 32;
+        if (shift >= 32) eu.raise_exception(STATUS_ILLEGAL_SHIFT);
+        return 1 << shift;
+    }

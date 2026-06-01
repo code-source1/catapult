@@ -1,0 +1,74 @@
+The following code example shows a case in which the tool cannot determine whether the
+accesses are sequential. In this example, both d_i and d_o are specified to be implemented with
+a FIFO interface during synthesis. In this case, you must ensure the access is sequential or you
+will be introducing errors into your system.
+#include "array_FIFO.h"
+void array_FIFO (dout_t d_o[4], din_t d_i[4], didx_t idx[4]) {
+ int i;
+#pragma HLS INTERFACE mode=ap_fifo port=d_i
+#pragma HLS INTERFACE mode=ap_fifo port=d_o
+ For_Loop: for (i=0;i<4;i++) {
+ d_o[i] = d_i[idx[i]];
+ }
+}
+In this case, the values of variable idx would determine whether or not a FIFO interface can be
+successfully created for argument d_i[].
+• If the values of the elements of idx are sequential, then a FIFO interface could be created
+• If random values are used for idx, a FIFO interface fails in Co-simulation when implemented
+in RTL, and can also fail during runtime
+However, because these conditions cannot be validated at compile time, Vitis HLS issues a
+message during synthesis and creates a FIFO interface:
+@W [XFORM-124] Array 'd_i': may have improper streaming access(es).
+In addition, the idx array is never read, because its elements are assumed to have sequential
+values starting from 0, due to the presence of the ap_fifo INTERFACE pragma.
+Note: FIFO ports cannot be synthesized for arrays that are both read from and written to in the same loop
+or function. Separate input and output arrays (as in the example above) must be created.
+The following general rules apply to arrays that are implemented with a FIFO interface:
+• The array must be only read or written in the loop or function. This can be transformed into a
+point-to-point connection that matches the characteristics of FIFO links.
+• The array reads must be in the same order as the array writes. Because random access is not
+supported for FIFO channels, the array must be used in the program following first in, first out
+semantics.
+The following conditions apply when the data type of an array is a struct, and the array is
+sequentially accessed (i.e. the array is specified with the axis or ap_fifo interface or is marked
+with STREAM pragma or directive):
+• You cannot access struct members directly from I/O arguments that use array-to-stream, or
+are as streaming interfaces. You can make a local copy of the struct to read/write member
+elements.
+• You must ensure sequential order access, as shown below
+struct A {
+ short foo;
+ int bar;
+};
+ 
+void dut(A in[N], A out[out], bool flag) {
+ #pragma HLS interface ap_fifo port=in,out
+ for (unsigned i=0; i<N; i++) {
+ A tmp = in[i];
+ if (flag)
+ tmp.bar += 5;
+ out[i] = tmp;
+ }
+}
+Bad example 1:
+void dut(A in[N], A out[out], bool flag) {
+Section II: HLS Programmers Guide
+Vitis HLS User Guide 90 Send Feedback
+ #pragma HLS interface ap_fifo port=in,out
+ for (unsigned i=0; i<N; i++) {
+ out[i] = in[i];
+ if (flag)
+ out[i].bar += 5;
+ }
+}
+Bad example 2:
+void dut(A in[N], A out[out], bool flag) {
+ #pragma HLS interface ap_fifo port=in,out
+ for (unsigned i=0; i<N; i++) {
+ out[i].foo = in[i].foo;
+ if (flag)
+ out[i].bar = in[i].bar + 5;
+ else
+ out[i].bar = in[i].bar;
+ }
+}

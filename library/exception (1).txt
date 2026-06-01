@@ -1,0 +1,31 @@
+T_Ref1
+# Error: $PROJECT_HOME/array_ops.cpp(45): out-of-bound array read 
+# Error: $PROJECT_HOME/array_ops.cpp(46): out-of-bound array write 
+# Error: $PROJECT_HOME/array_ops.cpp(52): unsupported exception keyword 'throw' 
+# Error: Compilation aborted 
+
+Overview: Exception-handling: Violations are reported when there are
+out-of-bound array reads/writes and illegal shifts. Additionally,
+whereas CPU programs use stack popping to handle exceptions, on ASIC,
+exception-handling modules need to be built to deliver the termination
+message to other modules.
+
+Example of a Violation:
+    void copy(int *src, int *dst) {
+        for (int i = 0; i <= 10; ++i) {
+            dst[i] = src[i];  // may read/write beyond allocated size
+        }
+        if (dst[10] < 0) throw std::runtime_error("neg");  // unsupported
+    }
+
+Correction Example 1 uses explicit bounds check and hardware exception module:
+    void copy_safe(int *src, int *dst, int size, ExceptionUnit &eu) {
+        for (int i = 0; i < size; ++i) {
+            dst[i] = src[i];
+        }
+        if (dst[size-1] < 0) {
+            eu.raise_exception(STATUS_NEGATIVE);
+        }
+    }
+
+

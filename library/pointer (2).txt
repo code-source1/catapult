@@ -1,0 +1,25 @@
+T_Ref2
+# Error: $PROJECT_HOME/main.cpp(82): Unsupported synthesis feature 'pointers-to-pointers on the interface' (CIN-243)
+# Error: Compilation aborted (CIN-5)
+
+Overview: Pointer: Dynamic Pointers are strictly forbidden in HLS tools,
+except for statically analyzable ones. Thus, developers need
+to manually convert pointer access to array access.
+
+Example of a Violation:
+<CPP>
+void copyBuffer(float* src, float* dst, int n) {
+    for (float* p = src; p < src + n; ++p) {
+        *dst++ = *p;
+    }
+}
+</CPP>
+
+Correction Example uses array indexing:
+<CPP>
+void copyBufferIndex(float dst[64], float src[64], int n) {
+    for (int i = 0; i < n; ++i) {
+        dst[i] = src[i];
+    }
+}
+</CPP>

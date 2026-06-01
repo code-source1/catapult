@@ -1,0 +1,55 @@
+# Error: $PROJECT_HOME/main.cpp(72): identifier "MAX_NODES" is undefined (CRD-20)
+# Error: $PROJECT_HOME/main.cpp(89): identifier "MAX_K" is undefined (CRD-20)
+
+Dynamic memory allocation (using new or delete in C++) can lead to unpredictable behavior and inefficiencies in the synthesized hardware. Below is a simple example of converting dynamic array allocation to static array allocation in C++.
+
+#include <iostream>
+
+int main() {
+    int n = 10; // Size of the array
+    int* arr = new int[n]; // Dynamic array allocation
+
+    // Initialize array
+    for (int i = 0; i < n; i++) {
+        arr[i] = i;
+    }
+
+    // Calculate sum of the array elements
+    int sum = 0;
+    for (int i = 0; i < n; i++) {
+        sum += arr[i];
+    }
+
+    delete[] arr;
+    return 0;
+}
+
+Static Array Version (After Conversion)
+Now, let’s convert the dynamic array to a static array. This conversion is crucial for HLS to properly optimize and predict the hardware resources needed.
+#include <iostream>
+
+const int N = 10; // Constant size of the array
+
+int main() {
+    int arr[N]; // Static array allocation
+
+    // Initialize array
+    for (int i = 0; i < N; i++) {
+        arr[i] = i;
+    }
+
+    // Calculate sum of the array elements
+    int sum = 0;
+    for (int i = 0; i < N; i++) {
+        sum += arr[i];
+    }
+
+    return 0;
+}
+
+Key Points in the Conversion:
+Static Size: The size of the array (N) is defined as a constant at compile time. This allows HLS tools to fully understand the memory requirements and constraints during synthesis.
+
+Array Definition: Instead of using a pointer and dynamic memory allocation with new, the array is declared with a fixed size.
+
+Memory Management: There is no need for manual memory management (no new or delete). This simplifies the design and avoids potential memory leaks or allocation errors in hardware.

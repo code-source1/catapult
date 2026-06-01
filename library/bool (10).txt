@@ -1,0 +1,32 @@
+T_Ref10
+# Error: $PROJECT_HOME/main.cpp(14): variable "increment" is used before its value is set (CRD-549)
+# Error: $PROJECT_HOME/main.cpp(15): incrementing a bool value is deprecated (CRD-708)
+# Error: Compilation aborted (CIN-5)
+
+Overview: In C++ and similar languages, boolean values (true and false) are not intended for
+arithmetic operations like incrementation (bt += 1 or bt++). The operations attempt to treat the
+boolean as an integer type, which is conceptually incorrect and can lead to unexpected behavior
+or errors.
+
+Example of a Violation:
+    void plugh(bool b) {
+        bool sub = b - 1;  // Incorrect: subtraction on bool
+    }
+    // Bool cannot be used in subtraction.
+
+Correction Example 1 uses an integer type:
+    void plugh(bool b) {
+        int val = b ? 1 : 0;
+        int sub = val - 1;
+        bool result = (sub != 0);
+    }
+
+Correction Example 2 uses conditional logic:
+    void plugh(bool b) {
+        bool result;
+        if (b) {
+            result = false; // 1 - 1 = 0 => false
+        } else {
+            result = true;  // 0 - 1 = -1 => true if treated
+        }
+    }

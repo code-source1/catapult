@@ -1,0 +1,18 @@
+If the address and life time of the read group (read_request() > read()) and write group
+(write_request() > write() > write_response()) overlap, the tool cannot
+guarantee the access order. C-simulation will report an error.
+void dut(hls::burst_maxi<int> A) {
+ A.write_request(0, 1);
+ A.write(x);
+ A.read_request(0, 1);
+ ... = A.read(); // What value is read? It is undefined. It could be 
+original A[0] or updated A[0].
+ A.write_response();
+}
+void dut(hls::burst_maxi<int> A) {
+ A.write_request(0, 1);
+ A.write(x);
+ A.write_response();
+ A.read_request(0, 1);
+ ... = A.read(); // this will read the updated A[0].
+}

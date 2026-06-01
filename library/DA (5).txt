@@ -1,0 +1,48 @@
+# Error: $PROJECT_HOME/main.cpp(89): identifier "MAX_K" is undefined (CRD-20)
+# Error: $PROJECT_HOME/main.cpp(14): Unsupported language feature 'variable length array (VLA)' (CIN-15)
+# Error: $PROJECT_HOME/main_c3.cpp(12): Unable to reduce array size for variable 'data_x', currently 1024 words (CIN-84)
+
+Use this when HLS reports unsupported pointer features, dynamic memory, malloc/free,
+or a linked structure made of Node* fields.
+
+Fix idea:
+Replace heap nodes and pointer links with a fixed-size static pool. Store links as
+integer indexes. Use a constant sentinel instead of NULL/nullptr.
+
+Before pattern:
+<CPP>
+struct Cell { int data; Cell *next; };
+Cell *head;
+Cell *p = (Cell *)malloc(sizeof(Cell));
+p->next = head;
+head = p;
+</CPP>
+
+After pattern:
+<CPP>
+#define MAX_CELL 32
+#define NIL MAX_CELL
+
+struct CellSlot { int data; int next; };
+CellSlot cell_pool[MAX_CELL];
+int head_idx;
+int used;
+
+void init_cells() {
+    head_idx = NIL;
+    used = 0;
+    for (int i = 0; i < MAX_CELL; ++i) {
+        cell_pool[i].data = 0;
+        cell_pool[i].next = NIL;
+    }
+}
+
+void add_cell(int x) {
+    if (used >= MAX_CELL) return;
+    int id = used++;
+    cell_pool[id].data = x;
+    cell_pool[id].next = head_idx;
+    head_idx = id;
+}
+</CPP>
+

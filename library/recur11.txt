@@ -1,0 +1,45 @@
+# Error: Unsupported language feature 'recursion' (CIN-15)
+# Error: Compilation aborted (CIN-5)
+
+Overview: Recursion, requiring dynamic memory in a stack, is not supported by
+HLS tools. Converting into a loop-based iteration or using template functions
+provided by the official reference manual of Catapult is required.
+
+Example of a Violation:
+    int binary_search(int *a, int lo, int hi, int key) {
+        if (lo > hi) return -1;
+        int mid = (lo + hi) / 2;
+        if (a[mid] == key) return mid;
+        if (a[mid] > key) return binary_search(a, lo, mid-1, key);
+        else return binary_search(a, mid+1, hi, key);
+    }
+    // Recursion needs to be replaced by loops.
+
+Correction Example 1 uses a loop-based iteration:
+    int bs_iter(int *a, int n, int key) {
+        int lo=0, hi=n-1;
+        while (lo <= hi) {
+            int mid = (lo + hi) >> 1;
+            if (a[mid] == key) return mid;
+            if (a[mid] > key) hi = mid - 1;
+            else lo = mid + 1;
+        }
+        return -1;
+    }
+
+Correction Example 2 uses templates provided by the Catapult manual:
+    template <int LO, int HI>
+    struct BSTpl {
+        static const int mid = (LO+HI)/2;
+        static int run(int *a, int key) {
+            if (LO > HI) return -1;
+            if (a[mid] == key) return mid;
+            if (a[mid] > key)
+                return BSTpl<LO, mid-1>::run(a, key);
+            else
+                return BSTpl<mid+1, HI>::run(a, key);
+        }
+    };
+    int bs_top(int *a, int key) {
+        return BSTpl<0,15>::run(a, key);
+    }

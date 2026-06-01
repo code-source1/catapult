@@ -1,0 +1,26 @@
+# Error: $PROJECT_HOME/main.cpp(89): identifier "MAX_K" is undefined (CRD-20)
+# Error: $PROJECT_HOME/main.cpp(14): Unsupported language feature 'variable length array (VLA)' (CIN-15)
+# Error: $PROJECT_HOME/main_c3.cpp(12): Unable to reduce array size for variable 'data_x', currently 1024 words (CIN-84)
+
+
+Overview: Dynamic Array: HLS tools do not support dynamic arrays because hardware designs cannot
+manage data structures with unbounded size. Hence, dynamic array functions such as malloc() and
+free() must be replaced with pre-allocated arrays.
+
+Example of a Violation:
+    void read_data(int n) {
+        std::vector<int> v(n);
+        // dynamic vector not allowed
+    }
+
+Correction Example 1 uses fixed-size std::array:
+    #include <array>
+    void read_data() {
+        std::array<int, 16> v;
+    }
+
+Correction Example 2 uses C-style static array:
+    void read_data() {
+        const int N = 16;
+        int v[N];
+    }

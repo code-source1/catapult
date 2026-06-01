@@ -1,0 +1,30 @@
+T_Ref5
+# Error: $PROJECT_HOME/main.cpp(14): variable "increment" is used before its value is set (CRD-549)
+# Error: $PROJECT_HOME/main.cpp(15): incrementing a bool value is deprecated (CRD-708)
+# Error: Compilation aborted (CIN-5)
+
+Overview: In C++ and similar languages, boolean values (true and false) are not intended for
+arithmetic operations like incrementation (bt += 1 or bt++). The operations attempt to treat the
+boolean as an integer type, which is conceptually incorrect and can lead to unexpected behavior
+or errors.
+
+Example of a Violation:
+    void corge(bool b) {
+        bool mod = b % 2;  // Incorrect: modulo on bool
+    }
+    // Bool cannot be used in modulo operation.
+
+Correction Example 1 uses an integer type:
+    void corge(bool b) {
+        int val = b ? 1 : 0;
+        int mod = val % 2;
+        bool result = (mod != 0);
+    }
+
+Correction Example 2 uses conditional logic:
+    void corge(bool b) {
+        bool result = false;
+        if (b) {
+            result = (1 % 2 != 0);
+        }
+    }

@@ -1,0 +1,46 @@
+# Error: $PROJECT_HOME/main.cpp(55): Unable to reduce array size for variable 'arr', currently 1024 words (CIN-84)
+# Error: Compilation aborted (CIN-5)
+
+Show how to convert it to use array indexing instead.
+
+Pointer-based Version
+Here's a simple code template that uses pointers to calculate the sum of elements in an array:
+<CPP>
+#include <iostream>
+using namespace std;
+
+#define MAX_LENGTH 100
+
+int sumWithPointers(int* arr, int size) {
+    int totalSum = 0;
+    int* end = arr + size;
+    for (int* ptr = arr; ptr < end; ptr++) {
+        totalSum += *ptr;
+    }
+    return totalSum;
+}
+
+Explanation
+Pointer Arithmetic: The function sumWithPointers uses a pointer ptr to traverse the array from the beginning arr to arr + size.
+Dereferencing: *ptr dereferences the pointer to get the current element of the array for addition.
+Array Indexing Version
+Now, let's convert the above pointer-based example into one that uses array indexing instead of pointers:
+
+<CPP>
+#include <iostream>
+using namespace std;
+
+int sumWithIndexing(int arr[MAX_LENGTH], int size) {
+    int totalSum = 0;
+    for (int i = 0; i < size; i++) {
+        totalSum += arr[i];
+    }
+    return totalSum;
+}
+
+Explanation
+Array Indexing: Instead of using pointers, sumWithIndexing accesses array elements directly using the index i.
+Simplicity: This approach is straightforward and may be easier for some to understand, as it avoids the complexities of pointer arithmetic and dereferencing.
+Conversion Process
+Replace Pointers with Array Indexes: Convert the pointer arithmetic to simple loop indexing (for (int i = 0; i < size; i++)).
+Direct Access: Replace the dereferencing of pointers (*ptr) with direct array access using the index (arr[i]).

@@ -1,0 +1,24 @@
+Optimization targets: Large latency
+CLUSTER_INLINE
+
+Description
+
+Beginner Level
+
+The CLUSTER_INLINE directive determines whether to include the cluster as a separate instance in the cycle or RTL netlist.
+
+The CLUSTER_INLINE directive specifies that the cluster be instantiated in the cycle netlist/RTL. In the first solution (test.v1), the CLUSTER directive is set to 'multadd' and the cluster is not inlined by default.
+
+The following RTL schematic shows the operator instantiations from the design:
+
+IMAGE
+
+In the second solution (test.v2), the CLUSTER directive is set to 'multadd' and the CLUSTER_INLINE directive to 'true'.
+
+Command syntax example:
+directive set /test/core/main -CLUSTER_INLINE true
+
+Why this target fits:
+CLUSTER_INLINE controls whether an extracted cluster is kept as a separate RTL instance. Inlining
+can expose the cluster to scheduling and downstream timing optimization, so it is mainly useful
+when the target is Large latency. Area impact is design-dependent, so it is not marked as primary.

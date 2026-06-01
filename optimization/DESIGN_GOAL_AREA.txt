@@ -1,0 +1,23 @@
+Optimization targets: Large area
+DESIGN_GOAL_AREA
+
+Description
+
+The DESIGN_GOAL directive sets the scheduling optimization goal. When it is set to area,
+Catapult prioritizes smaller resource choices while still trying to satisfy timing constraints.
+This is the most direct scheduling-level directive for a Large area request.
+
+Command syntax example:
+directive set -DESIGN_GOAL area
+directive set /process_top/core -DESIGN_GOAL area
+
+How to use:
+- Select this template when the user asks for Large area or area reduction.
+- It can be combined with AREA_GOAL or ARRAY_INDEX_OPTIMIZATION.
+- Do not combine it with DESIGN_GOAL_LATENCY in the same TCL script, because only one
+  DESIGN_GOAL should define the scheduler priority for the same design scope.
+
+Why this target fits:
+DESIGN_GOAL area tells Catapult's scheduler/resource selector to favor smaller hardware
+implementations. It directly addresses Large area by biasing the design toward lower area,
+possibly at the cost of latency.

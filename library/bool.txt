@@ -1,0 +1,41 @@
+# Error: $PROJECT_HOME/main.cpp(14): variable "increment" is used before its value is set (CRD-549)
+# Error: $PROJECT_HOME/main.cpp(15): incrementing a bool value is deprecated (CRD-708)
+# Error: Compilation aborted (CIN-5)
+
+In C++ and similar languages, boolean values (true and false) are not intended for arithmetic operations like incrementation (bt += 1 or bt++). The operations attempt to treat the boolean as an integer type, which is conceptually incorrect and can lead to unexpected behavior or errors.
+
+Original Code
+<CPP>
+#include <ac_int.h>
+#pragma hls_design top
+void AOB(ac_int<2, false> in1, bool bt, ac_int<10> &out) {
+    bt += 1;  // Incorrect: incrementing a boolean
+    bt++;     // Incorrect: incrementing a boolean
+    out = in1 + bt;  // Misuse of boolean in arithmetic expression
+}
+Correcting the Code
+To correct the code, we need to eliminate the improper use of the boolean variable in arithmetic contexts. Instead, if the logic requires altering a numerical value based on a boolean condition, we should use an appropriate integer type variable. Here's how you might correct it:
+
+Replace the boolean with an integer: If the logic of the function is to increment a value, use an integer type instead of a boolean.
+Conditional logic with boolean: If the intent was to alter the output based on the boolean's value, use conditional logic to adjust the output appropriately.
+Corrected Code
+Here's a version of the code that correctly uses an integer for arithmetic operations and uses the boolean for conditional logic:
+
+<CPP>
+#include <ac_int.h>
+#pragma hls_design top
+void AOB(ac_int<2, false> in1, bool bt, ac_int<10> &out) {
+    ac_int<2, false> increment = 0;  // Use an appropriate integer type for increments
+
+    if (bt) {  // Use the boolean for conditional logic
+        increment = 1;  // Set increment based on the boolean condition
+    }
+
+    out = in1 + increment;  // Correctly use an integer in the arithmetic expression
+}
+Explanation
+In the corrected code:
+
+increment is an integer: This allows proper arithmetic operations.
+Boolean bt controls logic, not arithmetic: The boolean bt is now used to conditionally set the value of increment, which is conceptually and technically correct.
+Arithmetic expression uses integers: The final output calculation now correctly uses only integer types (in1 and increment), ensuring predictable and error-free arithmetic operations.

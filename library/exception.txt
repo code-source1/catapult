@@ -1,0 +1,74 @@
+# Error: $PROJECT_HOME/main.cpp(12): unrecognized token (CRD-7)
+# Error: $PROJECT_HOME/main.cpp(12): expected a "}" (CRD-67)
+# Error: $PROJECT_HOME/main.cpp(12): "", line 9 (col. 6): note #3196-D: to match this "{" (CRD-67)
+# Error: $PROJECT_HOME/tb.cpp(20): identifier "IntegrationDump" is undefined (CRD-20)
+# Error: Compilation aborted (CIN-5)
+
+This template will show the code before and after inserting a basic error handling module.
+
+Pre-Error Handling Code
+Initially, the function processes inputs directly without any checks:
+
+#include <ac_fixed.h>
+#include <ac_channel.h>
+
+typedef ac_fixed<16, 8, false> IN_TYPE;
+typedef ac_fixed<16, 8, false> OUT_TYPE;
+
+void process_input(ac_channel<IN_TYPE>& inputs, ac_channel<OUT_TYPE>& outputs) {
+    IN_TYPE input;
+    OUT_TYPE output;
+
+    while(inputs.available(1)) {
+        inputs.read(input);
+        output = input; // Simple processing: output mirrors input
+        outputs.write(output);
+    }
+}
+Modifications for Error Handling
+Introduce a Check Function: A function to verify if the input meets specific criteria (e.g., input range).
+Modify the Main Processing Function: Include calls to the check function and a method to handle errors.
+Post-Error Handling Code
+Here's how you might modify the code to include simple error handling:
+
+cpp
+#include <ac_fixed.h>
+#include <ac_channel.h>
+
+typedef ac_fixed<16, 8, false> IN_TYPE;
+typedef ac_fixed<16, 8, false> OUT_TYPE;
+
+// Function to check the validity of the input
+bool check_input(IN_TYPE input) {
+    // Simple check: validate input is within a specific range
+    if (input < IN_TYPE(-50.0) || input > IN_TYPE(50.0)) {
+        return false; // Input is out of range
+    }
+    return true;
+}
+
+// Function to handle error scenario
+void handle_error(ac_channel<OUT_TYPE>& outputs) {
+    OUT_TYPE error_value = OUT_TYPE(-1); // Designate -1 as an error indicator
+    outputs.write(error_value);
+}
+
+// Modified function with error handling
+void process_input(ac_channel<IN_TYPE>& inputs, ac_channel<OUT_TYPE>& outputs) {
+    IN_TYPE input;
+    OUT_TYPE output;
+
+    while(inputs.available(1)) {
+        inputs.read(input);
+        if (!check_input(input)) {
+            handle_error(outputs);
+            continue; // Skip processing this input
+        }
+        output = input; // Simple processing: output mirrors input
+        outputs.write(output);
+    }
+}
+Explanation of Modifications
+check_input Function: This function checks if the input value is within an acceptable range. It returns false if the input is out of range, indicating an error.
+handle_error Function: This function writes a specific error value to the output channel when an error is detected. This value can be used to indicate to downstream components that there was an issue with processing.
+Integration in process_input: The main processing loop now includes a call to check_input. If check_input returns false, the handle_error function is invoked, and the loop continues without processing the problematic input.

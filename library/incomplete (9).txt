@@ -1,0 +1,28 @@
+T_Ref9
+# Error: $PROJECT_HOME/main.cpp(34): expected a statement (CRD-127)
+# Error: Compilation aborted (CIN-5)
+
+Overview: Incomplete Statement: HLS tools generate a violation when
+the switch/case statement does not completely cover the range of values
+for the object used in conditional expressions. Considering the
+uncovered values to complete the statement is needed.
+
+Example of a Violation:
+    #pragma hls_design top
+    void calc_idx(uint5 idx, uint8_t &byte) {
+      switch (idx) {
+        case 0: byte = 0xFF;
+        case 31: byte = 0x00;
+      }
+    }
+    // idx ∈ {0..31}, only 0 and 31 handled
+
+Example of a Fix:
+    #pragma hls_design top
+    void calc_idx(uint5 idx, uint8_t &byte) {
+      switch (idx) {
+        case 0:  byte = 0xFF;
+        case 31: byte = 0x00;
+        default: byte = 0xF0;
+      }
+    }

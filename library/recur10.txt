@@ -1,0 +1,35 @@
+# Error: Unsupported language feature 'recursion' (CIN-15)
+# Error: Compilation aborted (CIN-5)
+
+Overview: Recursion, requiring dynamic memory in a stack, is not supported by
+HLS tools. Converting into a loop-based iteration or using template functions
+provided by the official reference manual of Catapult is required.
+
+Example of a Violation:
+    int array_sum(int *a, int idx, int n) {
+        if (idx == n) return 0;
+        return a[idx] + array_sum(a, idx + 1, n);
+    }
+    // Recursion needs to be replaced by loops.
+
+Correction Example 1 uses a loop-based iteration:
+    int array_sum_iter(int *a, int n) {
+        int sum = 0;
+        for (int i = 0; i < n; ++i) {
+            sum += a[i];
+        }
+        return sum;
+    }
+
+Correction Example 2 uses templates provided by the Catapult manual:
+    template <int N>
+    int sum_tpl(int *a) {
+        return a[N-1] + sum_tpl<N-1>(a);
+    }
+    template <>
+    int sum_tpl<0>(int *a) {
+        return 0;
+    }
+    int sum_top(int *a) {
+        return sum_tpl<8>(a);  // sum of first 8 elements
+    }

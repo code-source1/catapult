@@ -1,0 +1,29 @@
+T_Ref7
+# Error: $PROJECT_HOME/main.cpp(34): expected a statement (CRD-127)
+# Error: Compilation aborted (CIN-5)
+
+Overview: Incomplete Statement: HLS tools generate a violation when
+the switch/case statement does not completely cover the range of values
+for the object used in conditional expressions. Considering the
+uncovered values to complete the statement is needed.
+
+Example of a Violation:
+    enum Mode {A, B, C};
+    #pragma hls_design top
+    void proc_mode(Mode m, uint8_t &out) {
+      switch (m) {
+        case A: out = 1;
+        case B: out = 2;
+      }
+    }
+    // C not handled
+
+Example of a Fix:
+    #pragma hls_design top
+    void proc_mode(Mode m, uint8_t &out) {
+      switch (m) {
+        case A: out = 1;
+        case B: out = 2;
+        default: out = 0;
+      }
+    }

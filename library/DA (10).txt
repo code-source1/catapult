@@ -1,0 +1,19 @@
+# Error: $PROJECT_HOME/main.cpp(89): identifier "MAX_K" is undefined (CRD-20)
+# Error: $PROJECT_HOME/main.cpp(14): Unsupported language feature 'variable length array (VLA)' (CIN-15)
+# Error: $PROJECT_HOME/main_c3.cpp(12): Unable to reduce array size for variable 'data_x', currently 1024 words (CIN-84)
+
+
+Overview: Dynamic Array: HLS tools do not support dynamic arrays because hardware designs cannot
+manage data structures with unbounded size. Hence, dynamic array functions such as malloc() and
+free() must be replaced with pre-allocated arrays.
+
+Example of a Violation:
+    void merge(int* a, int la, int* b, int lb) {
+        int* c = new int[la+lb];
+        // merging two arrays
+    }
+
+Correction Example 1 uses caller-allocated result buffer:
+    void merge(int* a, int la, int* b, int lb, int* c) {
+        for (int i = 0; i < la+lb; ++i) c[i] = (i<la)? a[i] : b[i-la];
+    }

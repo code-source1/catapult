@@ -1,0 +1,30 @@
+T_Ref4
+# Error: $PROJECT_HOME/main.cpp(14): variable "increment" is used before its value is set (CRD-549)
+# Error: $PROJECT_HOME/main.cpp(15): incrementing a bool value is deprecated (CRD-708)
+# Error: Compilation aborted (CIN-5)
+
+Overview: In C++ and similar languages, boolean values (true and false) are not intended for
+arithmetic operations like incrementation (bt += 1 or bt++). The operations attempt to treat the
+boolean as an integer type, which is conceptually incorrect and can lead to unexpected behavior
+or errors.
+
+Example of a Violation:
+    void qux(bool b) {
+        b *= 3;           // Incorrect: multiplication on bool
+    }
+    // Bool cannot be multiplied by integer.
+
+Correction Example 1 uses an integer type:
+    void qux(bool b) {
+        int val = b ? 1 : 0;
+        int prod = val * 3;
+        bool result = (prod > 0);
+    }
+
+Correction Example 2 uses conditional logic:
+    void qux(bool b) {
+        bool result = false;
+        if (b) {
+            result = true; // 1 * 3 gives true
+        }
+    }

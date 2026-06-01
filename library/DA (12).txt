@@ -1,0 +1,55 @@
+# Error: $PROJECT_HOME/main.cpp(6): Splitting of Resource '/process_top/core/node_pool.left:rsc' into 1024 variables could cause excessive runtime or memory requirements (MEM-8)
+# Error: $PROJECT_HOME/main.cpp(6): Please select a library with memories or increase REGISTER_THRESHOLD (MEM-8)
+
+Overview: Dynamic Array: MEM-8 can appear when a static array is much larger than the useful
+problem size, so Catapult tries to split the resource into too many scalar registers. Reduce the
+array to the algorithm's true compile-time bound, or keep the storage packed in fewer arrays.
+
+Example of a Violation:
+    struct Record {
+        int next_a;
+        int next_b;
+        int payload;
+    };
+
+    Record records[1024];
+
+    void clear_records() {
+        for (int i = 0; i < 1024; ++i) {
+            records[i].next_a = 1024;
+            records[i].next_b = 1024;
+            records[i].payload = 0;
+        }
+    }
+    // A 1024-entry struct array may be split into many register resources.
+
+Correction Example uses the real maximum and compact arrays:
+    #define MAX_RECORDS 16
+    #define NONE MAX_RECORDS
+
+    int next_a_mem[MAX_RECORDS];
+    int next_b_mem[MAX_RECORDS];
+    int payload_mem[MAX_RECORDS];
+
+    void clear_records_small() {
+        for (int i = 0; i < MAX_RECORDS; ++i) {
+            next_a_mem[i] = NONE;
+            next_b_mem[i] = NONE;
+            payload_mem[i] = 0;
+        }
+    }
+
+Correction Example keeps writes bounded:
+    void set_record(int id, int a, int b, int value) {
+        if (id >= 0 && id < MAX_RECORDS) {
+            next_a_mem[id] = a;
+            next_b_mem[id] = b;
+            payload_mem[id] = value;
+        }
+    }
+
+Key conversion steps:
+    - Do not use 1024 entries unless the design truly needs 1024 entries.
+    - Define a smaller MAX_* constant that matches the benchmark constraint.
+    - Prefer simple fixed arrays for fields that Catapult can map to small memories.
+    - Add index guards so no access exceeds MAX_*.

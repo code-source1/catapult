@@ -1,0 +1,25 @@
+T_Ref5
+# Error: $PROJECT_HOME/logic.cpp(22): illegal shift amount (CIN-103)
+# Error: $PROJECT_HOME/logic.cpp(23): out-of-bound array read (CIN-101)
+# Error: $PROJECT_HOME/logic.cpp(30): unsupported exception keyword 'try' (CIN-111)
+# Error: Compilation aborted (CIN-5)
+
+Overview: Exception-handling: Violations are reported when there are
+out-of-bound array reads/writes and illegal shifts. Additionally,
+whereas CPU programs use stack popping to handle exceptions, on ASIC,
+exception-handling modules need to be built to deliver the termination
+message to other modules.
+
+Example of a Violation:
+    bool evaluate(int *a) {
+        int x = 1 << 40;         // too large
+        int v = a[4];            // a has only 4 elements
+        try { return v > x; } catch(...) {}
+    }
+
+Correction Example 1 uses hardware exception unit:
+    bool evaluate_safe(int *a, ExceptionUnit &eu) {
+        if (40 >= 32) eu.raise_exception(STATUS_ILLEGAL_SHIFT);
+        int v = (4 < ARR_SIZE) ? a[4] : (eu.raise_exception(STATUS_OOB_READ),0);
+        return v > 0;
+    }

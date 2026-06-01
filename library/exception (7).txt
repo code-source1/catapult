@@ -1,0 +1,27 @@
+T_Ref7
+# Error: $PROJECT_HOME/mem.cpp(28): out-of-bound array read (CIN-101)
+# Error: $PROJECT_HOME/mem.cpp(29): unsupported exception keyword 'catch' (CIN-111)
+# Error: $PROJECT_HOME/mem.cpp(33): illegal shift amount (CIN-103)
+# Error: Compilation aborted (CIN-5)
+
+Overview: Exception-handling: Violations are reported when there are
+out-of-bound array reads/writes and illegal shifts. Additionally,
+whereas CPU programs use stack popping to handle exceptions, on ASIC,
+exception-handling modules need to be built to deliver the termination
+message to other modules.
+
+Example of a Violation:
+    void access(int *arr) {
+        int a = arr[-1];       // negative index
+        try { a <<= 33; } catch(...) {}
+    }
+
+Correction Example 1 uses clamp and exception unit:
+    void access_safe(int *arr, ExceptionUnit &eu) {
+        int idx = -1;
+        if (idx < 0 || idx >= ARR_SIZE) eu.raise_exception(STATUS_OOB_READ);
+        else {
+            int a = arr[idx];
+            if (33 >= 32) eu.raise_exception(STATUS_ILLEGAL_SHIFT);
+        }
+    }

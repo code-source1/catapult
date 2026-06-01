@@ -1,0 +1,29 @@
+T_Ref10
+# Error: $PROJECT_HOME/main.cpp(82): Unsupported synthesis feature 'pointers-to-pointers on the interface' (CIN-243)
+# Error: Compilation aborted (CIN-5)
+
+Overview: Pointer: Dynamic Pointers are strictly forbidden in HLS tools,
+except for statically analyzable ones. Thus, developers need
+to manually convert pointer access to array access.
+
+Example of a Violation:
+<CPP>
+void dotProduct(int* a, int* b, int n, int &out) {
+    int* pa = a;
+    int* pb = b;
+    out = 0;
+    for (int i = 0; i < n; ++i) {
+        out += (*pa++) * (*pb++);
+    }
+}
+</CPP>
+
+Correction Example uses array indexing:
+<CPP>
+void dotProductIndex(int a[32], int b[32], int n, int &out) {
+    out = 0;
+    for (int i = 0; i < n; ++i) {
+        out += a[i] * b[i];
+    }
+}
+</CPP>

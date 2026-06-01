@@ -1,0 +1,29 @@
+T_Ref1
+# Error: $PROJECT_HOME/main.cpp(34): expected a statement (CRD-127)
+# Error: Compilation aborted (CIN-5)
+
+Overview: Incomplete Statement: HLS tools generate a violation when
+the switch/case statement does not completely cover the range of values
+for the object used in conditional expressions. Considering the
+uncovered values to complete the statement is needed.
+
+Example of a Violation:
+    #include "ac_int.h"
+    #pragma hls_design top
+    void sel_sign(ac_int<2, false> mode, ac_int<8, true> &out) {
+      switch (mode) {
+        case 0: out = 0;
+        case 1: out = 1;
+      }
+    }
+    // mode ∈ {0,1,2,3}, but cases only 0 and 1
+
+Example of a Fix:
+    #pragma hls_design top
+    void sel_sign(ac_int<2, false> mode, ac_int<8, true> &out) {
+      switch (mode) {
+        case 0: out = 0;
+        case 1: out = 1;
+        default: out = -1;
+      }
+    }

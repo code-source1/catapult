@@ -1,0 +1,85 @@
+# Error: $PROJECT_HOME/main.cpp(82): Unsupported synthesis feature 'pointers-to-pointers on the interface' (CIN-243)
+# Error: $PROJECT_HOME/main.cpp(93): No definition for method 'CalculationStrategy::calculate' (CIN-16)
+# Error: Compilation aborted (CIN-5)
+
+#include <iostream>
+#define MAX_POINTS 100
+#define HASH_BASE 101
+
+class Strategy {
+public:
+    virtual int findMaxAligned(int pts[][2], int count) = 0;
+    virtual ~Strategy() {}
+};
+
+class AlignCalc : public Strategy {
+public:
+    int findMaxAligned(int pts[][2], int count) override {
+        if (count <= 2) return count;
+        int maxAligned = 0;
+        for (int i = 0; i < count; i++) {
+            int hashTable[HASH_BASE] = {0};
+            int localMax = 0;
+            for (int j = i + 1; j < count; j++) {
+                int deltaX = pts[j][0] - pts[i][0];
+                int deltaY = pts[j][1] - pts[i][1];
+                int index = (deltaX * 31 + deltaY) % HASH_BASE;
+                hashTable[index]++;
+                localMax = std::max(localMax, hashTable[index]);
+            }
+            maxAligned = std::max(maxAligned, localMax + 1);
+        }
+        return maxAligned;
+    }
+};
+
+class Points {
+public:
+    int data[MAX_POINTS][2];
+    int n;
+    Strategy* calculation;
+
+    Points() : calculation(new AlignCalc()) {}
+
+    ~Points() {
+        delete calculation;
+    }
+
+    int getMaxAligned() {
+        return calculation->findMaxAligned(data, n);
+    }
+};
+
+Converting Polymorphic Code to Non-Polymorphic Code
+To convert this polymorphic structure to a non-polymorphic design:
+
+Remove the Strategy Interface: Start by eliminating the Strategy class or interface. There's no need for an interface if there is no requirement for multiple implementations.
+
+Integrate Strategy Directly into Points: Instead of having a strategy object within the Points class, move the logic directly into a member function of the Points class. This means copying the contents of findMaxAligned from AlignCalc directly into a new member function in Points.
+
+Update Class Usages: Since Points will no longer use a strategy object, you should remove any references to the calculation pointer and any related dynamic memory management.
+
+class Points {
+public:
+    int data[MAX_POINTS][2];
+    int n;
+
+    int getMaxAligned() {
+        if (n <= 2) return n;
+        int maxAligned = 0;
+        for (int i = 0; i < n; i++) {
+            int hashTable[HASH_BASE] = {0};
+            int localMax = 0;
+            for (int j = i + 1; j < n; j++) {
+                int deltaX = data[j][0] - data[i][0];
+                int deltaY = data[j][1] - data[i][1];
+                int index = (deltaX * 31 + deltaY) % HASH_BASE;
+                hashTable[index]++;
+                localMax = std::max(localMax, hashTable[index]);
+            }
+            maxAligned = std::max(maxAligned, localMax + 1);
+        }
+        return maxAligned;
+    }
+};
+Eliminate the overhead associated with virtual functions and heap allocations where polymorphism is not necessary.

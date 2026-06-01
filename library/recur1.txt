@@ -1,0 +1,36 @@
+# Error: Unsupported language feature 'recursion' (CIN-15)
+# Error: Compilation aborted (CIN-5)
+
+Overview: Recursion, requiring dynamic memory in a stack, is not supported by
+HLS tools. Converting into a loop-based iteration or using template functions
+provided by the official reference manual of Catapult is required.
+
+Example of a Violation:
+    int recur(int n) {
+        if (n == 0) return 1;
+        return n * recursive(n - 1);
+    }
+// Recursion needs to be replaced by loops.
+
+Correction Example 1 uses a loop-based iteration:
+    int loop(int n) {
+        int result = 1;
+        for (int i = 1; i <= n; ++i) {
+            result *= i;
+        }
+        return result;
+    }
+
+Correction Example 2 uses templates provided by the Catapult manual:
+    template <int depth>
+    int template<0>() {
+        return 1;
+    }
+
+    int template<depth>() {
+        return depth * factorial<depth - 1>();
+    }
+
+    int top() {
+        return template<depth>();
+    }

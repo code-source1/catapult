@@ -1,0 +1,27 @@
+Optimization targets: Large latency
+PIPELINE_INIT_INTERVAL
+
+Description
+
+Beginner Level
+
+The PIPELINE_INIT_INTERVAL directive specifies the initiation interval for pipelined loops.
+
+In the first solution (test.v1), the default value of the directive disables pipelining on the loop. The following schedule shows how loop operations appear in the Schedule window.
+
+IMAGE
+
+In the second solution (test.v2), the PIPELINE_INIT_INTERVAL directive is set so that the loop has an II of 1. Instead of outputs appearing every 3 cycles, pipelining with an II of 1 means that data is appearing on the output every clock cycle. The solution table shows that the throughput for test.v2 is now 1, compared to the throughput value of 3 for test.v1. Although pipelining the loop decreased the throughput time, it also resulted in an area increase. Since the II of the loop is less than the loop latency, the schedule remains the same as the first solution (test.v1).
+
+IMAGE
+
+In the third solution (test.v3), the directive is set to a value (4) that is greater than the loop latency (3). This results in the following schedule:
+
+Command syntax example:
+directive set /test/core/main -PIPELINE_INIT_INTERVAL 1
+directive set /test/core/main -PIPELINE_INIT_INTERVAL 4
+
+Why this target fits:
+PIPELINE_INIT_INTERVAL controls loop throughput. A small II, especially II=1, allows a new loop
+iteration to start sooner and reduces effective latency/throughput time. It often increases area,
+so this template should be selected primarily for Large latency.

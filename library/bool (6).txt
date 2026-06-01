@@ -1,0 +1,30 @@
+T_Ref6
+# Error: $PROJECT_HOME/main.cpp(14): variable "increment" is used before its value is set (CRD-549)
+# Error: $PROJECT_HOME/main.cpp(15): incrementing a bool value is deprecated (CRD-708)
+# Error: Compilation aborted (CIN-5)
+
+Overview: In C++ and similar languages, boolean values (true and false) are not intended for
+arithmetic operations like incrementation (bt += 1 or bt++). The operations attempt to treat the
+boolean as an integer type, which is conceptually incorrect and can lead to unexpected behavior
+or errors.
+
+Example of a Violation:
+    void grault(bool b) {
+        bool shl = b << 1;  // Incorrect: bit shift on bool
+    }
+    // Bool cannot be shifted.
+
+Correction Example 1 uses an integer type:
+    void grault(bool b) {
+        int val = b ? 1 : 0;
+        int shl = val << 1;
+        bool result = (shl != 0);
+    }
+
+Correction Example 2 uses conditional logic:
+    void grault(bool b) {
+        bool result = false;
+        if (b) {
+            result = true; // 1 shifted left is 2, nonzero yields true
+        }
+    }

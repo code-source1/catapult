@@ -1,0 +1,54 @@
+# Error: $PROJECT_HOME/main.cpp(32): identifier "MAX_ROWS" is undefined (CRD-20)
+# Error: $PROJECT_HOME/main.cpp(32): identifier "MAX_COLS" is undefined (CRD-20)
+# Error: $PROJECT_HOME/main.cpp(72): identifier "MAX_NODES" is undefined (CRD-20)
+# Error: $PROJECT_HOME/main.cpp(89): identifier "MAX_K" is undefined (CRD-20)
+# Error: $PROJECT_HOME/main.cpp(14): Unsupported language feature 'variable length array (VLA)' (CIN-15)
+# Error: $PROJECT_HOME/main_c3.cpp(12): Unable to reduce array size for variable 'data_x', currently 1024 words (CIN-84)
+# Error: $PROJECT_HOME/main_c3.cpp(12): Unable to reduce array size for variable 'data_y', currently 1024 words (CIN-84) 
+# Error: $PROJECT_HOME/tb.cpp(18):             function "knn(fixed_point, fixed_point, fixed_point *, fixed_point *, int, int, int &)" (declared at line 7) (CRD-308)
+# Error: $PROJECT_HOME/tb.cpp(18):             argument types are: (fixed_point, fixed_point, fixed_point [10], fixed_point [10], int, int, int) (CRD-308)
+
+Dynamic Array: HLS tools do not support dynamic arrays because hardware designs cannot manage data structures with unbounded size. Hence, dynamic array functions such as malloc() and free() must be replaced with pre-allocated arrays.
+
+
+
+Before Conversion: Dynamic Array
+int main() {
+    int size = 5;
+    int* dynamicArray = new int[size]; // dynamic allocation
+
+    // Initializing array
+    for (int i = 0; i < size; i++) {
+        dynamicArray[i] = i * 2;  // Example initialization
+    }
+
+    // Accessing elements
+    for (int i = 0; i < size; i++) {
+        std::cout << dynamicArray[i] << " ";
+    }
+
+    delete[] dynamicArray; // Important: deallocate memory
+    return 0;
+}
+
+After Conversion: Static Array
+In the static array version, you define the array with a fixed size at compile time. The memory allocation and deallocation is automatically managed by the compiler.
+#include <iostream>
+
+int main() {
+    const int size = 5;
+    int staticArray[size];  // static allocation
+
+    // Initializing array
+    for (int i = 0; i < size; i++) {
+        staticArray[i] = i * 2;  // Example initialization
+    }
+
+    // Accessing elements
+    for (int i = 0; i < size; i++) {
+        std::cout << staticArray[i] << " ";
+    }
+
+    return 0;
+}
+

@@ -1,0 +1,43 @@
+# Error: $PROJECT_HOME/main.cpp(34): expected a statement (CRD-127)
+# > options set Message/ErrorOverride CRD-127 -append
+# > options set Message/ErrorOverride CRD-127 -append
+# > options set Message/ErrorOverride CRD-127 -append
+# Error: $PROJECT_HOME/main.cpp(34): expected a statement (CRD-127)
+# Error: $PROJECT_HOME/main.cpp(34): expected a statement (CRD-127)
+# Error: $PROJECT_HOME/main.cpp(34): expected a statement (CRD-127)
+# Error: $PROJECT_HOME/main.cpp(34): expected a statement (CRD-127)
+# Error: Compilation aborted (CIN-5)
+# Error: go analyze: Failed analyze
+# Error: Compilation aborted (CIN-5)
+
+CAS : Incomplete switch/case statement 
+This rule checks whether all possible values in the conditional of a switch/case are covered. CDesignChecker determines the values of the switch condition. A violation is reported when the case/switch statement does not completely cover the range of values for the object used in the conditional.
+These violations typically lead to the design entering an unintentional state. 
+Example of a Violation The default severity for violating this simulation mismatch check is ‘error
+#include "ac_int.h"
+
+#pragma hls_design top
+void CAS (uint6 a,
+          uint6 b,
+          ac_int<2, false> cond,
+          uint7 &z) {
+  switch (cond) {
+    case 0: z = a + b;
+    case 1: z = a + uint6(1);
+    case 2: z = a + uint6(2);
+  }
+}
+The example violation code contains a switch statement covering the values of the variable cond from 0 to 2. However, because the example does not contain a case statement for the fourth possible value of cond, Catapult will generate a CAS violation.
+Example of a Fix
+#pragma hls_design top
+void CAS (uint6 a,
+          uint6 b,
+          ac_int<2, false> cond,
+          uint7 &z) {
+  switch (cond) {
+    case 0: z = a + b;
+    case 1: z = a + uint6(1);
+    case 2: z = a + uint6(2);
+    default: z = z;
+  }
+}

@@ -1,0 +1,29 @@
+T_Ref6
+# Error: $PROJECT_HOME/div.cpp(15): out-of-bound array write 
+# Error: $PROJECT_HOME/div.cpp(16): illegal shift amount 
+# Error: $PROJECT_HOME/div.cpp(20): unsupported exception keyword 'throw' 
+# Error: Compilation aborted (CIN-5)
+
+Overview: Exception-handling: Violations are reported when there are
+out-of-bound array reads/writes and illegal shifts. Additionally,
+whereas CPU programs use stack popping to handle exceptions, on ASIC,
+exception-handling modules need to be built to deliver the termination
+message to other modules.
+
+Example of a Violation:
+    int divide_and_store(int *dst, int val) {
+        dst[10] = val / 0;       // division by zero and may oob
+        if (val < 0) throw -1;    // unsupported throw
+        return dst[10];
+    }
+
+Correction Example 1 uses checks and exception unit:
+    int divide_and_store_safe(int *dst, int size, int val, ExceptionUnit &eu) {
+        if (size > 10) {
+            dst[10] = (val != 0) ? (val/val) : (eu.raise_exception(STATUS_DIV_ZERO),0);
+        } else {
+            eu.raise_exception(STATUS_OOB_WRITE);
+        }
+        if (val < 0) eu.raise_exception(STATUS_NEGATIVE);
+        return dst[10];
+    }

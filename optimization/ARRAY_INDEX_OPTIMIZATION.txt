@@ -1,0 +1,18 @@
+Optimization targets: Large area
+ARRAY_INDEX_OPTIMIZATION
+
+Description
+
+The ARRAY_INDEX_OPTIMIZATION directive optimizes arrays with non-power-of-2 index values.
+
+In the first solution (test.v1) solution, the design is synthesized with only the default array optimizations.
+
+In the second solution (test.v2) solution, we set the ARRAY_INDEX_OPTIMIZATION directive to true. The resulting table shows that all areas improved as a result of the additional array optimizations.
+
+Command syntax example:
+directive set ARRAY_INDEX_OPTIMIZATION true
+
+Why this target fits:
+ARRAY_INDEX_OPTIMIZATION simplifies hardware generated for non-power-of-2 array indexes. The
+template description states that the resulting areas improved, so its primary target is Large area.
+Latency and power can improve only as side effects of simpler index logic.

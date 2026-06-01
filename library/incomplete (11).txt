@@ -1,0 +1,56 @@
+
+# Error: $PROJECT_HOME/main.cpp(39): Unsupported language feature 'goto' (CIN-15)
+# Error: Compilation aborted (CIN-5)
+# Error: go compile: Failed compile
+
+Overview: Incomplete Statement: HLS tools often reject unstructured control flow such as goto
+and shared failure labels. A goto makes scheduling and control-state construction harder, even
+when it is only used for error cleanup. Replace goto-based exits with structured flags,
+early returns, or guarded blocks.
+
+Example of a Violation:
+    void update(int n, int data[16], int *failed) {
+        bool bad = false;
+        for (int i = 0; i < n; ++i) {
+            if (i >= 16) {
+                bad = true;
+                goto done;
+            }
+            data[i] = i;
+        }
+    done:
+        *failed = bad;
+    }
+    // The goto jumps to a label and creates unstructured control flow.
+
+Correction Example 1 uses a status flag:
+    void update(int n, int data[16], int *failed) {
+        bool bad = false;
+        for (int i = 0; i < n; ++i) {
+            if (!bad) {
+                if (i >= 16) {
+                    bad = true;
+                } else {
+                    data[i] = i;
+                }
+            }
+        }
+        *failed = bad;
+    }
+
+Correction Example 2 uses early return:
+    void update(int n, int data[16], int *failed) {
+        *failed = 0;
+        if (n > 16) {
+            *failed = 1;
+            return;
+        }
+        for (int i = 0; i < n; ++i) {
+            data[i] = i;
+        }
+    }
+
+Key conversion steps:
+    - Remove every goto and label.
+    - Keep the failure condition in a boolean or integer status variable.
+    - Guard later work with if (!failed) instead of jumping to a fail label.

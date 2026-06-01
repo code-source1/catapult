@@ -1,0 +1,91 @@
+T_Ref11
+# Error: Unsupported synthesis feature 'pointers-to-pointers' (CIN-243)
+# Error: Unsupported language feature 'recursion' (CIN-15)
+# Error: Unsupported language feature 'goto' (CIN-15)
+# Error: Unable to reduce array size, currently 1024 words (CIN-84)
+# Error: Splitting of Resource into 1024 variables could cause excessive runtime or memory requirements (MEM-8)
+
+Overview: Dynamic Pointer: Pointer-based containers often need a whole-structure rewrite for HLS.
+Do not repair malloc, recursion, std::queue, and large arrays as separate unrelated issues.
+Convert the design to one static bounded representation: fixed pool, integer links, bounded loops,
+and fixed FIFO arrays.
+
+Example of a Violation:
+    struct Elem {
+        int key;
+        Elem *small;
+        Elem *large;
+    };
+
+    Elem *entry = 0;
+    Elem *p = (Elem *)malloc(sizeof(Elem));
+    p->small = 0;
+    p->large = 0;
+    // recursive linking and STL queue traversal may appear later
+
+Correction Example uses index links and static storage:
+    #define MAX_ELEM 10
+    #define EMPTY MAX_ELEM
+
+    struct ElemSlot {
+        int key;
+        int small;
+        int large;
+    };
+
+    ElemSlot slots[MAX_ELEM];
+    int root_id;
+    int used_slots;
+
+    void reset_slots() {
+        root_id = EMPTY;
+        used_slots = 0;
+        for (int i = 0; i < MAX_ELEM; ++i) {
+            slots[i].key = 0;
+            slots[i].small = EMPTY;
+            slots[i].large = EMPTY;
+        }
+    }
+
+    void attach_slot(int item, int root) {
+        int cur = root;
+        for (int step = 0; step < MAX_ELEM; ++step) {
+            if (slots[item].key < slots[cur].key) {
+                if (slots[cur].small == EMPTY) {
+                    slots[cur].small = item;
+                    break;
+                }
+                cur = slots[cur].small;
+            } else {
+                if (slots[cur].large == EMPTY) {
+                    slots[cur].large = item;
+                    break;
+                }
+                cur = slots[cur].large;
+            }
+        }
+    }
+
+    void visit_level_order(int start, int out[MAX_ELEM], int count) {
+        int fifo[MAX_ELEM];
+        int rd = 0;
+        int wr = 0;
+        int k = 0;
+        if (start == EMPTY) return;
+        fifo[wr++] = start;
+        for (int step = 0; step < MAX_ELEM; ++step) {
+            if (rd >= wr || k >= count) break;
+            int cur = fifo[rd++];
+            out[k++] = slots[cur].key;
+            if (slots[cur].small != EMPTY && wr < MAX_ELEM) fifo[wr++] = slots[cur].small;
+            if (slots[cur].large != EMPTY && wr < MAX_ELEM) fifo[wr++] = slots[cur].large;
+        }
+    }
+
+Key conversion steps:
+    - Node* and pointer fields become integer indexes.
+    - NULL/nullptr becomes a sentinel such as EMPTY.
+    - malloc/free becomes allocation from used_slots, bounded by MAX_ELEM.
+    - recursive insert becomes attach_slot with a bounded loop.
+    - std::queue becomes a fixed int fifo[MAX_ELEM].
+    - 1024-entry arrays become the benchmark's real small MAX bound.
