@@ -1,0 +1,108 @@
+#include "image.h"
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <filesystem>  // C++17 filesystem
+#include <cstdlib>
+
+using namespace std;
+
+// 固定的输入和输出路径
+const std::string INPUT_FILE_PATH = "/nas/ei/share/TUEIEDAscratch/ge86pak/hls/bwo1/c_ed2/1.dat";
+const std::string OUTPUT_DIR = "/nas/ei/share/TUEIEDAscratch/ge86pak/hls/bwo1/c_ed2/p";
+
+// 读取输入文件，将浮点数读入图像（最多 MAX_HEIGHT 行，每行最多 MAX_WIDTH 个数）
+SimpleImage readImage(const std::string& filename) {
+    ifstream file(filename);
+    if (!file.is_open()) {
+        cerr << "Error opening file: " << filename << endl;
+        exit(1);
+    }
+    
+    SimpleImage img;
+    img.width = 0;
+    img.height = 0;
+    
+    string line;
+    int y = 0;
+    while (getline(file, line) && y < MAX_HEIGHT) {
+        istringstream iss(line);
+        float value;
+        int x = 0;
+        while (iss >> value && x < MAX_WIDTH) {
+            img.data[y][x] = value;
+            x++;
+        }
+        if (y == 0) {
+            img.width = x; // 根据首行设置宽度
+        }
+        y++;
+    }
+    img.height = y;
+    file.close();
+    return img;
+}
+
+// 将图像保存为文本文件，数值之间以空格分隔，每行结束换行
+void saveImage(const SimpleImage& img, const std::string& filename) {
+    ofstream file(filename);
+    if (!file.is_open()){
+        cerr << "Cannot write to file: " << filename << endl;
+        return;
+    }
+    for (int y = 0; y < img.height; ++y) {
+        for (int x = 0; x < img.width; ++x) {
+            file << img.data[y][x];
+            if (x < img.width - 1)
+                file << " ";
+        }
+        file << "\n";
+    }
+    file.close();
+}
+
+int main() {
+    // 固定输出文件名称为 act_3.txt
+    string outputFile = OUTPUT_DIR + "/act_3.txt";
+    
+    // 读取图像并调用边缘检测（detectEdges 定义在 kernel.cpp 中）
+    SimpleImage img = readImage(INPUT_FILE_PATH);
+    detectEdges(img);
+    
+    // 统计非零和零像素数目
+    int nonZeroCount = 0;
+    int zeroCount = 0;
+    for (int y = 0; y < img.height; ++y) {
+        for (int x = 0; x < img.width; ++x) {
+            if (img.data[y][x] != 0.0f)
+                nonZeroCount++;
+            else
+                zeroCount++;
+        }
+    }
+    
+    // 保存降噪/边缘检测后的图像到 act_3.txt 文件中
+    saveImage(img, outputFile);
+    
+    // 将统计信息写入指定文件
+    ofstream nonZeroFile(OUTPUT_DIR + "/nzctxt");
+    ofstream zeroFile(OUTPUT_DIR + "/zc.txt");
+    
+    if (nonZeroFile.is_open()) {
+        nonZeroFile << nonZeroCount << endl;
+        nonZeroFile.close();
+    } else {
+        cerr << "Cannot write to file: " << OUTPUT_DIR + "/nzctxt" << endl;
+    }
+    
+    if (zeroFile.is_open()) {
+        zeroFile << zeroCount << endl;
+        zeroFile.close();
+    } else {
+        cerr << "Cannot write to file: " << OUTPUT_DIR + "/zc.txt" << endl;
+    }
+    
+    cout << "Edge detection completed. Processed image saved to " << outputFile << endl;
+    return 0;
+}
